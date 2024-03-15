@@ -1,12 +1,15 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import Disclosure from '../components/Disclosure';
 import { LoadingCircle, SendIcon } from '../components/icons';
+import {ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/24/outline'
 import Markdown from 'react-markdown'
+import { useCompletion } from 'ai/react';
+import { Disclosure } from '@headlessui/react'
+
 interface Preference {
   destination: string;
   travelDate: string;
@@ -39,37 +42,105 @@ const plan = `
 
 祝您在赫尔辛基度过愉快的时光！
 `;
+
 const dialogues = [
  {
     question: 'What is your destination?',
     id: 'destination',
+    tips: [{
+      text: 'Not sure which destination to go to? Need some recommendations?',
+      prompt: 'please recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
+    }]
  },
  {
     question: 'When do you plan to travel?',
     id: 'travelDate',
+    tips:[{
+      text: 'Want to know the best time to travel to your destination?'
+    }, {
+      text: 'Want a weather overview of your destination?'
+    }]
  },
  {
     question: 'How long will your trip be?',
     id: 'tripLength',
- },
- {
-    question: 'Do you have any specific landmarks or attractions you would like to visit?',
-    id: 'landmarks',
+    tips: [{
+      text: 'Suggested duration to visit the destination?',
+    }]
  },
  {
     question: 'What type of activities do you enjoy?',
     id: 'activities',
+    tips: [{
+      text: 'Want to know the main local travelling activities?'
+    }]
  },
+ {
+  question: 'Do you have any specific landmarks or attractions you would like to visit?',
+  id: 'places',
+  tips:[{
+    text: 'What are the main local attractions?'
+  }]
+},
  {
     question: 'Do you have any dietary requirements or restrictions?',
     id: 'dietary',
+    tips: [
+      {
+        text: 'What are the local food specialties?'
+      },
+      {
+        text: 'Local restaurant price ranges and options?'
+      }
+    ]
  },
+ {
+  id: 'transportation',
+  question: 'How do you plan to travel to your destination?',
+  tips: [
+    {
+      text: 'What are the main transportation options?'
+    },
+  ]
+ }, {
+  id: 'accommodation',
+  question: 'Where do you plan to stay during your trip?',
+  tips: [
+    {
+      text: 'What are the main accommodation options?'
+    },
+    {
+      text: 'What are the main local hotels and their price ranges?'
+    },
+    {
+      text: 'Want to know the best area to stay in?'
+    },
+  ]
+ },
+ {
+  id: 'other',
+  question: 'Any other preferences or requirements?',
+  tips: [{
+    text: 'currency exchange rate?'
+  }, {
+    text: 'local language and phrases?'
+  }]
+}
 ]
 
+interface UITip {
+  value: string;
+  open: boolean;
+}
+
 const Home: NextPage = () => {
+  const { completion, complete } =
+  useCompletion({
+    api: '/api/completion',
+  });
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
-  const [input, setInput] = useState('');
+  const [inputText, setInputText] = useState('');
   const [preference, setPreference] = useState<Preference>({
     destination: '',
     travelDate: '',
@@ -79,16 +150,43 @@ const Home: NextPage = () => {
     dietary: '',
   });
   const [planResult, setPlanResult] = useState('');
+  const [tipResult, setTipResult] = useState<UITip[]>([])
+  const [currentTipAnswer, setCurrentTipAnswer] = useState('');
+  useEffect(() => {
+    const currentTips = dialogues[step].tips.map((tip) => {
+      return {
+        value: '',
+        open: false
+      }
+    });
+    setTipResult(currentTips)
+  },
+  [step])
+
+  useEffect(() => {
+    if (completion) {
+      const updatedTipResult = tipResult.map((tip, index) => {
+        if (tip.open) {
+          return {
+            ...tip,
+            value: completion
+          }
+        }
+        return tip;
+      })
+      setTipResult(updatedTipResult);
+    }
+  }, [completion])
 
   const handleNext = (e: any) => {
-    if (!input) return;
+    if (!inputText) return;
     const updatedPreference = {
         ...preference,
-        [dialogues[step].id]: input,
+        [dialogues[step].id]: inputText,
     }
     setPreference(updatedPreference);
     console.log({ preference });
-    setInput('');
+    setInputText('');
     if (step === dialogues.length - 1) {
       setLoading(true);
       setTimeout(() => {
@@ -101,9 +199,35 @@ const Home: NextPage = () => {
     }
   };
 
+  const generateAnswer = async (tipIndex: number) => {
+    setLoading(true);
+    const prompt = `${dialogues[step].tips[tipIndex].prompt}`;
+    console.log({ prompt });
+    const response = await complete(`${prompt}, anwser the question directly in markdown format.`);
+    console.log({ response });
+    setLoading(false);
+  };
+
+  const handlClickTip = (index: number) => {
+    const isOpen = tipResult[index].open;
+    if (!isOpen && !tipResult[index].value) {
+      generateAnswer(index);
+    }
+    const newTipResult = tipResult.map((tip, i) => {
+      if (i === index) {
+        return {
+          ...tip,
+          open: !tip.open
+        }
+      }
+      return tip;
+    })
+    setTipResult(newTipResult);
+  }
+
   const renderStep = () => {
       return <>
-        <div className="flex items-center space-x-3">
+        <div className="flex-col justify-start items-start space-x-3">
           <p className="text-left font-medium">
             <span
               className="font-semibold text-white w-6 h-6 inline-flex justify-center rounded-full bg-black mr-1"
@@ -111,6 +235,29 @@ const Home: NextPage = () => {
             {dialogues[step].question}
             {/* <span className="text-slate-500">(city)</span> */}
           </p>
+          <div className='flex flex-col mt-4 gap-2'>
+          {
+            dialogues[step].tips && dialogues[step].tips.length > 0 ? 
+              dialogues[step].tips.map((tip, index) => {
+                return  <button
+                className="rounded-md border border-gray-200 bg-white text-left text-sm text-gray-500 transition-all duration-75 hover:gray-800 active:bg-gray-50"
+                onClick={(e) => {
+                  handlClickTip(index)
+                }}
+              >
+                <div className='flex gap-2 items-center bg-blue-100	'>
+                  <span className='font-bold text-blue-800 px-4 py-2'>{tip.text}</span>
+                  { tipResult[index] && tipResult[index].open ?
+                  <ChevronDownIcon className="h-4 w-4 text-blue-800" /> : <ChevronRightIcon className="h-4 w-4 text-blue-800" />}
+                </div>
+                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4'>
+                  {tipResult[index].value ? tipResult[index].value : 'loading...'}
+                </Markdown> }
+              </button>
+              })
+             : null
+          }
+          </div>
         </div>
       </>
   }
@@ -131,7 +278,7 @@ const Home: NextPage = () => {
 
       <Header />
       <main className="flex flex-1 w-full flex-col items-center  text-center px-4 ">
-      <div className="border-gray-200sm:mx-0 mx-5 mt-20 max-w-screen-md rounded-md border sm:w-full">
+      <div className="border-gray-200sm:mx-0 mx-5 mt-5 max-w-screen-md rounded-md border sm:w-full">
           <div className="flex flex-col space-y-4 p-7 sm:p-10 items-center">
             <Image
               src="/tourbuddy.jpeg"
@@ -153,13 +300,6 @@ const Home: NextPage = () => {
              {
               planResult ? renderPlan() : renderStep()
              }
-              {/* <button
-                className="rounded-md border border-gray-200 bg-white px-5 py-3 text-left text-sm text-gray-500 transition-all duration-75 hover:border-black hover:text-gray-700 active:bg-gray-50"
-                onClick={() => {
-                }}
-              >
-                example
-              </button> */}
           </div>
           
         </div>
@@ -173,8 +313,8 @@ const Home: NextPage = () => {
           className="relative w-full max-w-screen-md rounded-xl border border-gray-200 bg-white px-4 pb-2 pt-3 shadow-lg sm:pb-3 sm:pt-4"
         >
           <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
             />
             <button className='absolute inset-y-0 right-3 top-1 my-auto flex h-8 w-8 items-center justify-center rounded-md transition-all'
