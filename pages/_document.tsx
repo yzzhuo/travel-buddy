@@ -8,9 +8,9 @@ class MyDocument extends Document {
           <link rel="icon" href="/favicon.ico" />
           <meta
             name="description"
-            content="Generate your next Twitter bio in seconds."
+            content="Generate your travel plan in seconds."
           />
-          <meta property="og:site_name" content="twitterbio.io" />
+          <meta property="og:site_name" content="tourbuddy" />
           <meta
             property="og:description"
             content="Generate your next Twitter bio in seconds."

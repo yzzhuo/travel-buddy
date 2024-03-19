@@ -8,7 +8,7 @@ import { LoadingCircle, SendIcon } from '../components/icons';
 import {ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/24/outline'
 import Markdown from 'react-markdown'
 import { useCompletion } from 'ai/react';
-import { Disclosure } from '@headlessui/react'
+import remarkGfm from 'remark-gfm'
 
 interface Preference {
   destination: string;
@@ -19,29 +19,8 @@ interface Preference {
   dietary: string;
 }
 
-const plan = `
-根据您提供的信息，我为您创建了赴赫尔辛基的旅行计划：
-
-### 赴赫尔辛基旅行计划
-
-- **目的地**: 赫尔辛基
-- **出行日期**: 2024年3月20日
-- **行程长度**: 2天
-
-#### 活动安排：
-- **滑雪**: 在赫尔辛基附近的滑雪场享受滑雪运动。
-
-#### 餐饮安排：
-- 暂无特殊饮食要求。
-
-#### 地标参观：
-- 无需参观地标。
-
-#### 注意事项：
-- 请提前安排好滑雪装备，并确保了解当地天气状况，以便做好准备。
-
-祝您在赫尔辛基度过愉快的时光！
-`;
+const language = 'Chinese';
+const plan = ``;
 
 const dialogues = [
  {
@@ -49,16 +28,18 @@ const dialogues = [
     id: 'destination',
     tips: [{
       text: 'Not sure which destination to go to? Need some recommendations?',
-      prompt: 'please recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
+      prompt: (preference: Preference) => 'please recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
     }]
  },
  {
     question: 'When do you plan to travel?',
     id: 'travelDate',
     tips:[{
-      text: 'Want to know the best time to travel to your destination?'
+      text: 'Want to know the best time to travel to your destination?',
+      prompt: (preference: Preference) =>`what is the best time to visit ${preference.destination}?`
     }, {
-      text: 'Want a weather overview of your destination?'
+      text: 'Want a weather overview of your destination?',
+      prompt: (preference: Preference) => `Give me the weather overview of ${preference.destination}?`
     }]
  },
  {
@@ -66,20 +47,23 @@ const dialogues = [
     id: 'tripLength',
     tips: [{
       text: 'Suggested duration to visit the destination?',
+      prompt: (preference: Preference) => `what is the suggested duration to visit ${preference.destination}?`
     }]
  },
  {
     question: 'What type of activities do you enjoy?',
     id: 'activities',
     tips: [{
-      text: 'Want to know the main local travelling activities?'
+      text: 'Want to know the main local travelling activities?',
+      prompt: (preference: Preference) => `What are the main local activities in ${preference.destination}?`
     }]
  },
  {
   question: 'Do you have any specific landmarks or attractions you would like to visit?',
   id: 'places',
   tips:[{
-    text: 'What are the main local attractions?'
+    text: 'What are the main local attractions?',
+    prompt: (preference: Preference) => `What are the main local attractions in ${preference.destination}?`
   }]
 },
  {
@@ -87,10 +71,12 @@ const dialogues = [
     id: 'dietary',
     tips: [
       {
-        text: 'What are the local food specialties?'
+        text: 'What are the local food specialties?',
+        prompt: (preference: Preference) => `What are the local food specialties in ${preference.destination}?`
       },
       {
-        text: 'Local restaurant price ranges and options?'
+        text: 'Local restaurant price ranges and options?',
+        prompt: (preference: Preference) => `What are the local restaurant price ranges and options in ${preference.destination}?`
       }
     ]
  },
@@ -99,7 +85,8 @@ const dialogues = [
   question: 'How do you plan to travel to your destination?',
   tips: [
     {
-      text: 'What are the main transportation options?'
+      text: 'What are the main transportation options?',
+      prompt: (preference: Preference) => `What are the main transportation options to ${preference.destination}?`
     },
   ]
  }, {
@@ -107,13 +94,16 @@ const dialogues = [
   question: 'Where do you plan to stay during your trip?',
   tips: [
     {
-      text: 'What are the main accommodation options?'
+      text: 'What are the main accommodation options?',
+      prompt: (preference: Preference) => `What are the main accommodation options in ${preference.destination}?`
     },
     {
-      text: 'What are the main local hotels and their price ranges?'
+      text: 'What are the main local hotels and their price ranges?',
+      prompt: (preference: Preference) => `What are the main local hotels and their price ranges in ${preference.destination}?`
     },
     {
-      text: 'Want to know the best area to stay in?'
+      text: 'Want to know the best area to stay in?',
+      prompt: (preference: Preference) => `What is the best area to stay in ${preference.destination}?`
     },
   ]
  },
@@ -121,9 +111,11 @@ const dialogues = [
   id: 'other',
   question: 'Any other preferences or requirements?',
   tips: [{
-    text: 'currency exchange rate?'
+    text: 'currency exchange rate?',
+    prompt: (preference: Preference) => `What is the currency exchange rate in ${preference.destination}?`
   }, {
-    text: 'local language and phrases?'
+    text: 'local language?',
+    prompt: (preference: Preference) => `What are the local language in ${preference.destination}?`
   }]
 }
 ]
@@ -149,9 +141,9 @@ const Home: NextPage = () => {
     activities: '',
     dietary: '',
   });
-  const [planResult, setPlanResult] = useState('');
+  const [planResult, setPlanResult] = useState(plan);
   const [tipResult, setTipResult] = useState<UITip[]>([])
-  const [currentTipAnswer, setCurrentTipAnswer] = useState('');
+  const [finishedInput, setFinishedInput] = useState(false);
   useEffect(() => {
     const currentTips = dialogues[step].tips.map((tip) => {
       return {
@@ -165,16 +157,20 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (completion) {
-      const updatedTipResult = tipResult.map((tip, index) => {
-        if (tip.open) {
-          return {
-            ...tip,
-            value: completion
+      if (finishedInput) {
+        setPlanResult(completion);
+      } else {
+        const updatedTipResult = tipResult.map((tip, index) => {
+          if (tip.open) {
+            return {
+              ...tip,
+              value: completion
+            }
           }
-        }
-        return tip;
-      })
-      setTipResult(updatedTipResult);
+          return tip;
+        })
+        setTipResult(updatedTipResult);
+      }
     }
   }, [completion])
 
@@ -188,12 +184,8 @@ const Home: NextPage = () => {
     console.log({ preference });
     setInputText('');
     if (step === dialogues.length - 1) {
-      setLoading(true);
-      setTimeout(() => {
-        setPlanResult(plan);
-        setLoading(false);
-      }, 1000);
-      return;
+      generatePlan();
+      setFinishedInput(true);
     } else {
       setStep(step + 1);
     }
@@ -201,12 +193,41 @@ const Home: NextPage = () => {
 
   const generateAnswer = async (tipIndex: number) => {
     setLoading(true);
-    const prompt = `${dialogues[step].tips[tipIndex].prompt}`;
+    const prompt = `${dialogues[step].tips[tipIndex].prompt(preference)}`;
+    console.log({ prompt });
+    const response = await complete(`${prompt}, anwser the question directly in markdown format and content should be in ${language}.`);
+    console.log({ response });
+    setLoading(false);
+  };
+
+  const generatePlan = async () => {
+    setLoading(true);
+    const prompt = `generate a travel plan and itinerary for me baesd on my preferences and requirements, content should be in ${language}.
+    my preferences:
+    ${JSON.stringify(preference)}
+    ---
+    the requirement of the travel plan:
+    1.Title
+    {startDate} | {duration} | {amount of country} {amount of city}
+    2.table for Itinerary summary include fields:
+    - Date 
+    - City
+    - Transportation 
+    - Places to visit
+    - Things to do
+    - accommodation
+    3.Itinerary detail of each day includes:
+    - Date
+    - Route
+    - Landmarks and activities of each day(each place should contains address, transportation, price, brief introduction and tip and image of the place)
+    4. todo list for thing to do before travel (like booking hotel etc.)
+    5. packing list
+    `;
     console.log({ prompt });
     const response = await complete(`${prompt}, anwser the question directly in markdown format.`);
     console.log({ response });
     setLoading(false);
-  };
+  }
 
   const handlClickTip = (index: number) => {
     const isOpen = tipResult[index].open;
@@ -220,7 +241,10 @@ const Home: NextPage = () => {
           open: !tip.open
         }
       }
-      return tip;
+      return {
+        ...tip,
+        open: false
+      };
     })
     setTipResult(newTipResult);
   }
@@ -265,7 +289,7 @@ const Home: NextPage = () => {
   const renderPlan = () => {
 
     return <div className='text-left'>
-      <Markdown>{planResult}</Markdown>
+      <Markdown remarkPlugins={[remarkGfm]}>{planResult}</Markdown>
     </div>
   }
 
@@ -295,17 +319,15 @@ const Home: NextPage = () => {
             </p>
           </div>
           <div className="flex flex-col space-y-4 border-t border-gray-200 bg-gray-50 p-7 sm:p-10">
-            {/* {renderStep()}
-             */}
              {
-              planResult ? renderPlan() : renderStep()
+              finishedInput ? renderPlan() : renderStep()
              }
           </div>
           
         </div>
         
         <div className="fixed bottom-0 flex w-full flex-col items-center space-y-3 bg-gradient-to-b from-transparent via-gray-100 to-gray-100 p-5 pb-3 sm:px-0">
-        {!planResult ? <form
+        {!finishedInput ? <form
           onSubmit={(e) => {
             e.preventDefault();
             handleNext(e);
