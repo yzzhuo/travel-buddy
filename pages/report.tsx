@@ -261,22 +261,6 @@ const Home: NextPage = () => {
             >
             </iframe> */}
         </div>
-
-        {/* <div role="tablist" className="tabs tabs-boxed mt-20">
-          <a role="tab" className="tab tab-active">Plan</a>
-          <a role="tab" className="tab ">Itinerary</a>
-          <a role="tab" className="tab">Tourbook</a>
-        </div>
-
-        <ul className="steps">
-          <li className="step step-primary">Register</li>
-          <li className="step step-primary">Choose plan</li>
-          <li className="step">Purchase</li>
-          <li className="step">Receive Product</li>
-        </ul> */}
-
-        
-        
       </main>
     </div>
     )
