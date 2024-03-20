@@ -4,9 +4,10 @@ export interface TravelPreference {
   destination: string;
   startDate: string;
   duration: number;
-  places: string;
-  activities: string;
-  dietary: string;
+  interests?: string;
+  places?: string;
+  activities?: string;
+  dietary?: string;
 }
 
 export interface PlanResult {
@@ -29,28 +30,28 @@ export interface Itinerary {
 export interface PlacesToVisit {
   name: string
   address: string
-  transportation: string
   price: string
   brief_intro: string
   tip?: string
+  type: 'attraction' | 'restaurant' | 'activities'
 }
 
+
 export const generatePromptForTravelPlan = (preferences: TravelPreference) => {
-  return `generate a travel plan and itinerary for me baesd on my preferences, only reply a JSON meet the requirements types of resultt .
-  my preferences:
+  return `I am planning a trip here is my preferences:
   ---
   ${JSON.stringify(preferences)}
   ---
-  requirements types of result:
+  Please Generate a JSON response with the following structure:
   ---
-  export interface Result {
+  interface Result {
     startDate: string
     duration: string
     city: string
     country: string
     itinerary: Itinerary[]
   }
-  export interface Itinerary {
+  interface Itinerary {
     date: string
     city: string
     transportation: 'driving' | 'walking | 'bicycling'
@@ -58,12 +59,13 @@ export const generatePromptForTravelPlan = (preferences: TravelPreference) => {
     things_to_do: string
     accommodation: string
   }
-  export interface PlacesToVisit {
+  interface PlacesToVisit {
     name: string
     address: string
     price: string
     brief_intro: string
     tip?: string
+    type: 'attraction' | 'restaurant' | 'activities'
   }
   ---
   `;
@@ -75,14 +77,25 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
   }) {
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-    const generateDirectionQuery = (places: any) => {
-      let query = `origin=${places[0].name.replace('', '+')}&destination=${places[places.length - 1].name.replace('', '+')}&`;
-      if (places.length > 2) {
-        query += `waypoints=`;
-        // join the middle waypoints with |
-        query += places.slice(1, places.length - 1).map((place: any) => place.name.replace('', '+')).join('|');
+
+    const generateDirectionQuery = (places: any[]) => {
+      if (places.length > 0) {
+        let query = `origin=${places[0].name.replace('', '+')}&destination=${places[places.length - 1].name.replace('', '+')}&`;
+        if (places.length > 2) {
+          query += `waypoints=`;
+          // join the middle waypoints with |
+          query += places.slice(1, places.length - 1).map((place: any) => place.name.replace('', '+')).join('|');
+        }
+        return query;
       }
-      return query;
+    }
+
+    const getTransportationMode = (transportation: string) => {
+      if (['driving', 'walking', 'bicycling'].includes(transportation)) {
+        return transportation;
+      } else {
+        return 'driving';
+      }
     }
   return (
   <div className='flex flex-col justify-center items-center my-4'>
@@ -178,7 +191,7 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
                       height={750}
                       style={{border:0, width: '100%', height:'600px', maxWidth: '100%'}}
                       referrerPolicy="no-referrer-when-downgrade"
-                      src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&${generateDirectionQuery(item.places_to_visit)}&mode=${item.transportation}`}
+                      src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&${generateDirectionQuery(item.places_to_visit)}&mode=${getTransportationMode(item.transportation)}`}
                       allowFullScreen
                     />
                   </div>

@@ -40,24 +40,20 @@ const dialogues = [
       prompt: (preference: TravelPreference) => `what is the suggested duration to visit ${preference.destination}?`
     }]
  },
-//  {
-//     question: 'What type of activities do you enjoy?',
-//     id: 'activities',
-//     tips: [{
-//       text: 'Want to know the main local travelling activities?',
-//       prompt: (preference: Preference) => `What are the main local activities in ${preference.destination}, give me some options I could select with bold text?`
-//     }]
-//  },
  {
-  question: 'Do you have any specific landmarks or attractions you would like to visit?',
-  id: 'places',
+  question: 'Do you have any interested specific landmarks or activities?',
+  id: 'interests',
   tips:[{
-    text: 'What are the main local attractions?',
+    text: 'What are the main local attractions, list the must-try local specialties?',
     prompt: (preference: TravelPreference) => `What are the main local attractions in ${preference.destination}?`
-  }]
+  }, {
+      text: 'Want to know the main local travelling activities?',
+      prompt: (preference: TravelPreference) => `What are the main local activities in ${preference.destination}, give me some options I could select with bold text?`
+    }
+  ]
  },
  {
-    question: 'Do you have any dietary restrictions and do you have any specific food you would like to try?',
+    question: 'Do you have any dietary restrictions or do you have local food you want to try?',
     id: 'dietary',
     tips: [
       {
@@ -70,34 +66,6 @@ const dialogues = [
       }
     ]
  },
-//  {
-//   id: 'transportation',
-//   question: 'How do you plan to travel to your destination?',
-//   tips: [
-//     {
-//       text: 'What are the main transportation options?',
-//       prompt: (preference: Preference) => `What are the main transportation options to ${preference.destination}?`
-//     },
-//   ]
-//  },
-// {
-//   id: 'accommodation',
-//   question: 'Where do you plan to stay during your trip?',
-//   tips: [
-//     {
-//       text: 'What are the main accommodation options?',
-//       prompt: (preference: Preference) => `What are the main accommodation options in ${preference.destination}?`
-//     },
-//     {
-//       text: 'What are the main local hotels and their price ranges?',
-//       prompt: (preference: Preference) => `What are the main local hotels and their price ranges in ${preference.destination}?`
-//     },
-//     {
-//       text: 'Want to know the best area to stay in?',
-//       prompt: (preference: Preference) => `What is the best area to stay in ${preference.destination}?`
-//     },
-//   ]
-//  },
  {
   id: 'other',
   question: 'Any other preferences or tips you would like to know?',
@@ -196,7 +164,7 @@ useEffect(() => {
     setLoading(true);
     const prompt = `${dialogues[step].tips[tipIndex].prompt(preference)}`;
     console.log({ prompt });
-    const response = await complete(`${prompt}, anwser the question directly in markdown format and content should be in English.`);
+    const response = await complete(`${prompt}, anwser the question directly with content that are easy to read and clearly structured markdown format(for example use title/bold/list smartly).`);
     console.log({ response });
     setLoading(false);
   };
@@ -298,7 +266,7 @@ useEffect(() => {
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
-        <title>Twitter Bio Generator</title>
+        <title>Travel Plan Generator</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -344,7 +312,6 @@ useEffect(() => {
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
             />
             <button className='absolute inset-y-0 right-3 top-1 my-auto flex h-8 w-8 items-center justify-center rounded-md transition-all'
-              // onClick={handleNext}  
             >
               {loading ? (
                   <LoadingCircle />
