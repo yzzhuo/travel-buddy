@@ -134,7 +134,7 @@ const Home: NextPage = () => {
       <Header />
       <main className="w-screen h-screen">
         {!finished ? <form className="flex flex-col items-center justify-center w-full ">
-          <h1 className="text-3xl font-bold mb-4">Where do you want to go?</h1>
+          <h1 className="text-3xl font-bold my-4 pt-4">Where do you want to go?</h1>
           <div className="max-w-xl w-full">
           <div className="flex mt-10 items-center space-x-3">
             <p className="text-left font-bold">
@@ -215,7 +215,7 @@ const Home: NextPage = () => {
             <h1>Trip to {preferences.destination}</h1>
             <div className='flex gap-4 font-bold'>
               <span>Start Date: {data.startDate}</span>
-              <span>Duration: {data.duration}</span>
+              <span>Duration: {data.duration} day</span>
               <span>Destination: {data.city}, {data.country}</span>
             </div>
           </div>

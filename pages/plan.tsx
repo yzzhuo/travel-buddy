@@ -8,19 +8,9 @@ import { LoadingCircle, SendIcon } from '../components/icons';
 import {ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/24/outline'
 import Markdown from 'react-markdown'
 import { useCompletion } from 'ai/react';
-import remarkGfm from 'remark-gfm'
+import TravelPlanReport, { PlanResult, TravelPreference, generatePromptForTravelPlan } from '../components/TravelPlanReport';
+import LoadingDots from '../components/LoadingDots';
 
-interface Preference {
-  destination: string;
-  travelDate: string;
-  tripLength: string;
-  landmarks: string;
-  activities: string;
-  dietary: string;
-}
-
-const language = 'Chinese';
-const plan = ``;
 
 const dialogues = [
  {
@@ -28,7 +18,7 @@ const dialogues = [
     id: 'destination',
     tips: [{
       text: 'Not sure which destination to go to? Need some recommendations?',
-      prompt: (preference: Preference) => 'please recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
+      prompt: (preference: TravelPreference) => 'please recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
     }]
  },
  {
@@ -36,10 +26,10 @@ const dialogues = [
     id: 'travelDate',
     tips:[{
       text: 'Want to know the best time to travel to your destination?',
-      prompt: (preference: Preference) =>`what is the best time to visit ${preference.destination}?`
+      prompt: (preference: TravelPreference) =>`what is the best time to visit ${preference.destination}?`
     }, {
       text: 'Want a weather overview of your destination?',
-      prompt: (preference: Preference) => `Give me the weather overview of ${preference.destination}?`
+      prompt: (preference: TravelPreference) => `Give me the weather overview of ${preference.destination}?`
     }]
  },
  {
@@ -47,75 +37,76 @@ const dialogues = [
     id: 'tripLength',
     tips: [{
       text: 'Suggested duration to visit the destination?',
-      prompt: (preference: Preference) => `what is the suggested duration to visit ${preference.destination}?`
+      prompt: (preference: TravelPreference) => `what is the suggested duration to visit ${preference.destination}?`
     }]
  },
- {
-    question: 'What type of activities do you enjoy?',
-    id: 'activities',
-    tips: [{
-      text: 'Want to know the main local travelling activities?',
-      prompt: (preference: Preference) => `What are the main local activities in ${preference.destination}?`
-    }]
- },
+//  {
+//     question: 'What type of activities do you enjoy?',
+//     id: 'activities',
+//     tips: [{
+//       text: 'Want to know the main local travelling activities?',
+//       prompt: (preference: Preference) => `What are the main local activities in ${preference.destination}, give me some options I could select with bold text?`
+//     }]
+//  },
  {
   question: 'Do you have any specific landmarks or attractions you would like to visit?',
   id: 'places',
   tips:[{
     text: 'What are the main local attractions?',
-    prompt: (preference: Preference) => `What are the main local attractions in ${preference.destination}?`
+    prompt: (preference: TravelPreference) => `What are the main local attractions in ${preference.destination}?`
   }]
-},
+ },
  {
-    question: 'Do you have any dietary requirements or restrictions?',
+    question: 'Do you have any dietary restrictions and do you have any specific food you would like to try?',
     id: 'dietary',
     tips: [
       {
         text: 'What are the local food specialties?',
-        prompt: (preference: Preference) => `What are the local food specialties in ${preference.destination}?`
+        prompt: (preference: TravelPreference) => `What are the local food specialties in ${preference.destination}?`
       },
       {
         text: 'Local restaurant price ranges and options?',
-        prompt: (preference: Preference) => `What are the local restaurant price ranges and options in ${preference.destination}?`
+        prompt: (preference: TravelPreference) => `What are the local restaurant price ranges and options in ${preference.destination}?`
       }
     ]
  },
- {
-  id: 'transportation',
-  question: 'How do you plan to travel to your destination?',
-  tips: [
-    {
-      text: 'What are the main transportation options?',
-      prompt: (preference: Preference) => `What are the main transportation options to ${preference.destination}?`
-    },
-  ]
- }, {
-  id: 'accommodation',
-  question: 'Where do you plan to stay during your trip?',
-  tips: [
-    {
-      text: 'What are the main accommodation options?',
-      prompt: (preference: Preference) => `What are the main accommodation options in ${preference.destination}?`
-    },
-    {
-      text: 'What are the main local hotels and their price ranges?',
-      prompt: (preference: Preference) => `What are the main local hotels and their price ranges in ${preference.destination}?`
-    },
-    {
-      text: 'Want to know the best area to stay in?',
-      prompt: (preference: Preference) => `What is the best area to stay in ${preference.destination}?`
-    },
-  ]
- },
+//  {
+//   id: 'transportation',
+//   question: 'How do you plan to travel to your destination?',
+//   tips: [
+//     {
+//       text: 'What are the main transportation options?',
+//       prompt: (preference: Preference) => `What are the main transportation options to ${preference.destination}?`
+//     },
+//   ]
+//  },
+// {
+//   id: 'accommodation',
+//   question: 'Where do you plan to stay during your trip?',
+//   tips: [
+//     {
+//       text: 'What are the main accommodation options?',
+//       prompt: (preference: Preference) => `What are the main accommodation options in ${preference.destination}?`
+//     },
+//     {
+//       text: 'What are the main local hotels and their price ranges?',
+//       prompt: (preference: Preference) => `What are the main local hotels and their price ranges in ${preference.destination}?`
+//     },
+//     {
+//       text: 'Want to know the best area to stay in?',
+//       prompt: (preference: Preference) => `What is the best area to stay in ${preference.destination}?`
+//     },
+//   ]
+//  },
  {
   id: 'other',
-  question: 'Any other preferences or requirements?',
+  question: 'Any other preferences or tips you would like to know?',
   tips: [{
     text: 'currency exchange rate?',
-    prompt: (preference: Preference) => `What is the currency exchange rate in ${preference.destination}?`
+    prompt: (preference: TravelPreference) => `What is the currency exchange rate in ${preference.destination}?`
   }, {
     text: 'local language?',
-    prompt: (preference: Preference) => `What are the local language in ${preference.destination}?`
+    prompt: (preference: TravelPreference) => `What are the local language in ${preference.destination}?`
   }]
 }
 ]
@@ -133,17 +124,27 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [inputText, setInputText] = useState('');
-  const [preference, setPreference] = useState<Preference>({
+  const [preference, setPreference] = useState<TravelPreference>({
     destination: '',
-    travelDate: '',
-    tripLength: '',
-    landmarks: '',
+    startDate: '',
+    duration: 1,
+    places: '',
     activities: '',
     dietary: '',
   });
-  const [planResult, setPlanResult] = useState(plan);
+  const [data, setData] = useState<PlanResult>(
+    {
+    startDate: '',
+    duration: '',
+    city: '',
+    country: '',
+    itinerary: [],
+  }
+  );
   const [tipResult, setTipResult] = useState<UITip[]>([])
   const [finishedInput, setFinishedInput] = useState(false);
+  const [finished, setFinished] = useState(false);
+
   useEffect(() => {
     const currentTips = dialogues[step].tips.map((tip) => {
       return {
@@ -155,10 +156,10 @@ const Home: NextPage = () => {
   },
   [step])
 
-  useEffect(() => {
+useEffect(() => {
     if (completion) {
       if (finishedInput) {
-        setPlanResult(completion);
+        return;
       } else {
         const updatedTipResult = tipResult.map((tip, index) => {
           if (tip.open) {
@@ -195,43 +196,41 @@ const Home: NextPage = () => {
     setLoading(true);
     const prompt = `${dialogues[step].tips[tipIndex].prompt(preference)}`;
     console.log({ prompt });
-    const response = await complete(`${prompt}, anwser the question directly in markdown format and content should be in ${language}.`);
+    const response = await complete(`${prompt}, anwser the question directly in markdown format and content should be in English.`);
     console.log({ response });
     setLoading(false);
   };
 
   const generatePlan = async () => {
     setLoading(true);
-    const prompt = `generate a travel plan and itinerary for me baesd on my preferences and requirements, content should be in ${language}.
-    my preferences:
-    ${JSON.stringify(preference)}
-    ---
-    the requirement of the travel plan:
-    1.Title
-    {startDate} | {duration} | {amount of country} {amount of city}
-    2.table for Itinerary summary include fields:
-    - Date 
-    - City
-    - Transportation 
-    - Places to visit
-    - Things to do
-    - accommodation
-    3.Itinerary detail of each day includes:
-    - Date
-    - Route
-    - Landmarks and activities of each day(each place should contains address, transportation, price, brief introduction and tip and image of the place)
-    4. todo list for thing to do before travel (like booking hotel etc.)
-    5. packing list
-    `;
+    const prompt = generatePromptForTravelPlan(preference);
     console.log({ prompt });
-    const response = await complete(`${prompt}, anwser the question directly in markdown format.`);
+    const response = await complete(prompt);
     console.log({ response });
+    console.log({ prompt });
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const response = await complete(prompt);
+        console.log({ response });
+        const result = JSON.parse(response as string);
+        console.log({ result });
+        setData(result);
+        setFinished(true);
+        break; // If successful, break the loop
+      } catch (error) {
+        console.error(error);
+        // If it's the last iteration, rethrow the error
+        if (i === maxRetries - 1) throw error;
+      }
+    }
     setLoading(false);
   }
 
   const handlClickTip = (index: number) => {
     const isOpen = tipResult[index].open;
-    if (!isOpen && !tipResult[index].value) {
+    // if (!isOpen && !tipResult[index].value) {
+      if (!isOpen) {
       generateAnswer(index);
     }
     const newTipResult = tipResult.map((tip, i) => {
@@ -287,12 +286,15 @@ const Home: NextPage = () => {
   }
 
   const renderPlan = () => {
-
     return <div className='text-left'>
-      <Markdown remarkPlugins={[remarkGfm]}>{planResult}</Markdown>
+      {/* <Markdown remarkPlugins={[remarkGfm]}>{planResult}</Markdown> */}
+      <TravelPlanReport 
+        data={data} 
+        preferences={preference}
+        onChangeData={setData}
+        />
     </div>
   }
-
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
       <Head>
@@ -302,7 +304,7 @@ const Home: NextPage = () => {
 
       <Header />
       <main className="flex flex-1 w-full flex-col items-center  text-center px-4 ">
-      <div className="border-gray-200sm:mx-0 mx-5 mt-5 max-w-screen-md rounded-md border sm:w-full">
+      {finished ? renderPlan() :<> <div className="border-gray-200sm:mx-0 mx-5 mt-5 max-w-screen-md rounded-md border sm:w-full">
           <div className="flex flex-col space-y-4 p-7 sm:p-10 items-center">
             <Image
               src="/tourbuddy.jpeg"
@@ -319,13 +321,15 @@ const Home: NextPage = () => {
             </p>
           </div>
           <div className="flex flex-col space-y-4 border-t border-gray-200 bg-gray-50 p-7 sm:p-10">
-             {
-              finishedInput ? renderPlan() : renderStep()
-             }
+             {  finishedInput ? 
+             <div className='flex flex-col justify-center items-center gap-2'>
+              <LoadingDots color="black" style="large" />
+               Generating, Please wait a moment
+             </div>
+            :
+             renderStep()}
           </div>
-          
         </div>
-        
         <div className="fixed bottom-0 flex w-full flex-col items-center space-y-3 bg-gradient-to-b from-transparent via-gray-100 to-gray-100 p-5 pb-3 sm:px-0">
         {!finishedInput ? <form
           onSubmit={(e) => {
@@ -350,49 +354,11 @@ const Home: NextPage = () => {
                   />
                 )}
             </button>
-        </form> : null}
-        <p className="text-center text-xs text-gray-400">
-          Built with{" "}
-          <a
-            href="https://sdk.vercel.ai/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-colors hover:text-black"
-          >
-            Vercel AI SDK
-          </a>
-          ,{" "}
-          <a
-            href="https://openai.com/blog/gpt-3-5-turbo-fine-tuning-and-api-updates"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-colors hover:text-black"
-          >
-            OpenAI GPT-3.5-turbo, and fine-tuned
-          </a>{" "}
-          on Shakespeare's literary works .{" "}
-          <a
-            href="https://github.com/steven-tey/shooketh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-colors hover:text-black"
-          >
-            View the repo
-          </a>{" "}
-          or{" "}
-          <a
-            href="https://vercel.com/templates/next.js/shooketh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-colors hover:text-black"
-          >
-            deploy your own
-          </a>
-          .
-        </p>
+        </form>  : null}
       </div>
+      </>
+      } 
       </main>
-      <Footer />
     </div>
   );
 };
