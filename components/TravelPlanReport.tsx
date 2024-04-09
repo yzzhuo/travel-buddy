@@ -98,7 +98,7 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
       }
     }
   return (
-  <div className='flex flex-col justify-center items-center my-4'>
+  <div className='flex flex-col justify-center items-center my-4 bg-white shadow-lg p-4'>
     <div className="prose flex flex-col items-center justify-center space-x-3">
       <h1>Trip to {preferences.destination}</h1>
       <div className='flex gap-4 font-bold'>

@@ -2,7 +2,6 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { LoadingCircle, SendIcon } from '../components/icons';
 import {ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/24/outline'
@@ -10,7 +9,6 @@ import Markdown from 'react-markdown'
 import { useCompletion } from 'ai/react';
 import TravelPlanReport, { PlanResult, TravelPreference, generatePromptForTravelPlan } from '../components/TravelPlanReport';
 import LoadingDots from '../components/LoadingDots';
-
 
 const dialogues = [
  {
@@ -66,17 +64,17 @@ const dialogues = [
       }
     ]
  },
- {
-  id: 'other',
-  question: 'Any other preferences or tips you would like to know?',
-  tips: [{
-    text: 'currency exchange rate?',
-    prompt: (preference: TravelPreference) => `What is the currency exchange rate in ${preference.destination}?`
-  }, {
-    text: 'local language?',
-    prompt: (preference: TravelPreference) => `What are the local language in ${preference.destination}?`
-  }]
-}
+//  {
+//   id: 'other',
+//   question: 'Any other preferences or tips you would like to know?',
+//   tips: [{
+//     text: 'currency exchange rate?',
+//     prompt: (preference: TravelPreference) => `What is the currency exchange rate in ${preference.destination}?`
+//   }, {
+//     text: 'local language?',
+//     prompt: (preference: TravelPreference) => `What are the local language in ${preference.destination}?`
+//   }]
+// }
 ]
 
 interface UITip {
@@ -219,7 +217,7 @@ useEffect(() => {
   const renderStep = () => {
       return <>
         <div className="flex-col justify-start items-start space-x-3">
-          <p className="text-left font-medium">
+          <p className="text-left font-medium flex-auto">
             <span
               className="font-semibold text-white w-6 h-6 inline-flex justify-center rounded-full bg-black mr-1"
             >{step + 1}</span>
@@ -288,7 +286,13 @@ useEffect(() => {
               I'm an AI bot help you to make your personalized travel plan
             </p>
           </div>
-          <div className="flex flex-col space-y-4 border-t border-gray-200 bg-gray-50 p-7 sm:p-10">
+          <div className='w-full relative h-1 bg-gray-50'>
+            <div className={`absolute h-1 bg-orange-500`} style={{
+              width: `${(step + 1) * 100 / dialogues.length}%`
+            }}></div>
+          </div>
+          <div className="flex flex-col space-y-4 border-t border-gray-200 bg-gray-50 p-4 sm:p-10">
+         
              {  finishedInput ? 
              <div className='flex flex-col justify-center items-center gap-2'>
               <LoadingDots color="black" style="large" />
