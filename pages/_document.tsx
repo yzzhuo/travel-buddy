@@ -31,7 +31,12 @@ class MyDocument extends Document {
             content="https://twitterbio.io/og-image.png"
           />
         </Head>
-        <body>
+        <body style={{
+          backgroundImage: "url('/bg_tourbuddy.png')",
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat'
+        }}>
           <Main />
           <NextScript />
         </body>
