@@ -271,18 +271,18 @@ useEffect(() => {
       <Header />
       <main className="flex flex-1 w-full flex-col items-center  text-center px-4 ">
       {finished ? renderPlan() :<> <div className="border-gray-200sm:mx-0 mx-5 mt-5 max-w-screen-md rounded-md border sm:w-full">
-          <div className="flex flex-col space-y-4 p-7 sm:p-10 items-center bg-white shadow-lg">
+          <div className="flex flex-col md:space-y-4 p-7 sm:p-10 items-center bg-white shadow-lg">
             <Image
               src="/avatar.png"
               alt="tourbuddy"
               width={40}
               height={40}
-              className="h-18 w-20"
+              className="h-12 w-14 md:h-18 md:w-20"
             />
             <h1 className="text-lg font-semibold text-black">
               Hi, I'm Tourbuddy!
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-500 sm:block hidden">
               I'm an AI bot help you to make your personalized travel plan
             </p>
           </div>
