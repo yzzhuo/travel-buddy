@@ -1,3 +1,4 @@
+// @ts-ignore
 import TravelPlanReport, { PlanResult } from '@/components/TravelPlanReport';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -14,7 +15,6 @@ const Home: NextPage = () => {
       "duration": "3days",
       "city": "Paris",
       "country": "France",
-      "destination_image": "https://example.com/paris_image",
       "itinerary": [
         {
           "date": "April 1",
@@ -57,7 +57,7 @@ const Home: NextPage = () => {
             {
               "name": "Sainte-Chapelle",
               "address": "8 Boulevard du Palais, 75001 Paris",
-              "transportation": "Metro",
+              "transportation": "bus",
               "price": "10€",
               "brief_intro": "Sainte-Chapelle is known for its stunning stained glass windows, depicting biblical scenes and stories.",
               "tip": "Visit during sunny days to see the windows at their most vibrant."
@@ -65,14 +65,12 @@ const Home: NextPage = () => {
             {
               "name": "Canal Saint-Martin",
               "address": "Canal Saint-Martin, Paris",
-              "transportation": "Metro",
               "price": "Free",
               "brief_intro": "Stroll along the picturesque canal and explore the trendy shops and cafes along its banks."
             },
             {
               "name": "Le Marais District",
               "address": "Le Marais, Paris",
-              "transportation": "Metro",
               "price": "Free",
               "brief_intro": "Explore the historic Le Marais district, known for its narrow streets, historic mansions, and trendy shops and cafes."
             }
@@ -83,12 +81,12 @@ const Home: NextPage = () => {
         {
           "date": "April 3",
           "city": "Paris",
-          "transportation": "Metro",
+          "transportation": "bus",
           "places_to_visit": [
             {
               "name": "Luxembourg Gardens",
               "address": "75006 Paris",
-              "transportation": "Metro",
+              "transportation": "bus",
               "price": "Free",
               "brief_intro": "Relax in the beautiful Luxembourg Gardens, known for its formal gardens, fountains, and statues.",
               "tip": "Visit early in the morning for a peaceful experience."
@@ -96,20 +94,18 @@ const Home: NextPage = () => {
             {
               "name": "Île de la Cité",
               "address": "Île de la Cité, Paris",
-              "transportation": "Metro",
               "price": "Free",
               "brief_intro": "Discover the historic heart of Paris on Île de la Cité, home to iconic landmarks such as Notre-Dame Cathedral and Sainte-Chapelle."
             },
             {
               "name": "Panthéon",
               "address": "Place du Panthéon, 75005 Paris",
-              "transportation": "Metro",
               "price": "9€",
               "brief_intro": "Visit the Panthéon, a mausoleum containing the remains of many notable French figures, including Voltaire, Rousseau, and Victor Hugo."
             }
           ],
           "things_to_do": "Relax in the beautiful Luxembourg Gardens, discover the historic heart of Paris on Île de la Cité, visit the Panthéon.",
-          "accommodation": "Hotel XYZ (60€)"
+          "accommodation": "Hotel XYZ (60€)",
         }
       ]
   } as PlanResult;
