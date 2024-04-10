@@ -19,8 +19,8 @@ const dialogues = [
     question: 'What is your destination?',
     id: 'destination',
     tips: [{
-      text: 'Need some recommendations for your destination?',
-      prompt: (preference: TravelPreference) => 'Recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
+      text: 'Give me some recommendations for destination?',
+      prompt: (preference: TravelPreference) => 'Give me some suggested destinations of Europe with brief reason for my recent travel?(city be bolded)'
     }]
  },
  {
@@ -167,15 +167,21 @@ useEffect(() => {
 
   const generatePlan = async () => {
     setLoading(true);
-    const prompt = generatePromptForTravelPlan(preference);
-    console.log({ preference, prompt });
-    const response = await completeJSON(prompt);
-    console.log({ response });
-    const result = JSON.parse(response as string);
-    console.log({ result });
-    setData(result);
-    setFinished(true);
-    setLoading(false);
+    try {
+      const prompt = generatePromptForTravelPlan(preference);
+      console.log({ preference, prompt });
+      const response = await completeJSON(prompt);
+      console.log({ response });
+      const result = JSON.parse(response as string);
+      console.log({ result });
+      setData(result);
+      setFinished(true);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to generate the travel plan');
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handlClickTip = (index: number) => {
