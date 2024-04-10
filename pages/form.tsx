@@ -5,7 +5,8 @@ import Header from '../components/Header';
 import { useCompletion } from 'ai/react';
 import LoadingDots from '../components/LoadingDots';
 import { MapIcon } from '@heroicons/react/24/outline';
-import TravelPlanReport, { PlanResult, TravelPreference, generatePromptForTravelPlan } from '../components/TravelPlanReport';
+import TravelPlanReport, { generatePromptForTravelPlan } from '../components/TravelPlanReport';
+import { PlanResult, TravelPreference } from '@/lib/types';
 
 
 const Home: NextPage = () => {

@@ -1,6 +1,7 @@
 import LoadingDots from '@/components/LoadingDots';
-import TravelPlanReport, { PlanResult } from '@/components/TravelPlanReport';
+import TravelPlanReport from '@/components/TravelPlanReport';
 import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard';
+import { PlanResult } from '@/lib/types';
 import { ArrowUpOnSquareIcon } from '@heroicons/react/24/outline';
 import Head from 'next/head';
 import { useRouter } from 'next/router';

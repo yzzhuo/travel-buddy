@@ -5,8 +5,8 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Header from '../../components/Header';
 import { useCompletion } from 'ai/react';
-import TravelPlanReport, { PlanResult, TravelPreference, generatePromptForTravelPlan } from '../../components/TravelPlanReport';
-import { PlanStep } from '@/lib/types';
+import TravelPlanReport, {  generatePromptForTravelPlan } from '../../components/TravelPlanReport';
+import { PlanResult, PlanStep, TravelPreference } from '@/lib/types';
 import Chat from '@/components/Chat';
 import LoadingDots from '@/components/LoadingDots';
 
