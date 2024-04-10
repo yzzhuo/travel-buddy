@@ -277,7 +277,7 @@ useEffect(() => {
               alt="tourbuddy"
               width={40}
               height={40}
-              className="h-12 w-14 md:h-18 md:w-20"
+              className="h-12 w-14 md:h-18 md:w-18"
             />
             <h1 className="text-lg font-semibold text-black">
               Hi, I'm Tourbuddy!
