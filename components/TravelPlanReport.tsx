@@ -2,11 +2,11 @@ import { MapIcon } from '@heroicons/react/24/outline';
 import { PlanResult, TravelPreference } from '@/lib/types';
 
 export const generatePromptForTravelPlan = (preferences: TravelPreference) => {
-  return `I am planning a trip here is my preferences:
+  return `given my travel preferences:
   ---
   ${JSON.stringify(preferences)}
   ---
-  Please Generate a JSON response with the following structure:
+  Output json with following structure:
   ---
   interface Result {
     startDate: string

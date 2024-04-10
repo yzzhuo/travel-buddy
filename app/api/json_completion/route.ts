@@ -18,10 +18,11 @@ export async function POST(req: Request) {
 
   // Ask OpenAI for a streaming completion given the prompt
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo',
+    model: 'gpt-4-turbo-preview',
     stream: true,
+    response_format: { "type": "json_object" },
     messages: [
-      { role: "system", content: "You are a helpful assistant help user to explore and plan their trip." },
+      { role: "system", content: "You are a helpful assistant help user to discover and plan their trip." },
       { role: "user", content: prompt },
     ],
   });

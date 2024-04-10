@@ -19,8 +19,8 @@ const dialogues = [
     question: 'What is your destination?',
     id: 'destination',
     tips: [{
-      text: 'Not sure which destination to go to? Need some recommendations?',
-      prompt: (preference: TravelPreference) => 'please recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
+      text: 'Need some recommendations for your destination?',
+      prompt: (preference: TravelPreference) => 'Recommend some cities of Europe with brief reason for my recent travel?(city be bolded)'
     }]
  },
  {
@@ -91,6 +91,9 @@ const Home: NextPage = () => {
   useCompletion({
     api: '/api/completion',
   });
+  const { completion: completionJSON, complete: completeJSON } = useCompletion({
+    api: '/api/json_completion',
+  });
   const [loading, setLoading] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -155,7 +158,7 @@ useEffect(() => {
     console.log({ preference });
     setInputText('');
     if (step === dialogues.length - 1) {
-      generatePlan();
+      generatePlan(updatedPreference);
       setFinishedInput(true);
     } else {
       setStep(step + 1);
@@ -171,29 +174,16 @@ useEffect(() => {
     setLoading(false);
   };
 
-  const generatePlan = async () => {
+  const generatePlan = async (preference: TravelPreference) => {
     setLoading(true);
     const prompt = generatePromptForTravelPlan(preference);
-    console.log({ prompt });
-    const response = await complete(prompt);
+    console.log({ preference, prompt });
+    const response = await completeJSON(prompt);
     console.log({ response });
-    console.log({ prompt });
-    const maxRetries = 3;
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        const response = await complete(prompt);
-        console.log({ response });
-        const result = JSON.parse(response as string);
-        console.log({ result });
-        setData(result);
-        setFinished(true);
-        break; // If successful, break the loop
-      } catch (error) {
-        console.error(error);
-        // If it's the last iteration, rethrow the error
-        if (i === maxRetries - 1) throw error;
-      }
-    }
+    const result = JSON.parse(response as string);
+    console.log({ result });
+    setData(result);
+    setFinished(true);
     setLoading(false);
   }
 
