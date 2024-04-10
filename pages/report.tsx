@@ -116,12 +116,12 @@ const Home: NextPage = () => {
   } as Preference;
 
   return (
-    <div className="flex flex-col w-full px-4 py-24 mx-auto stretch">
+    <div className="flex flex-col w-full mx-auto stretch">
       <Head>
         <title>tourbuddy</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className='w-full px-28'>
+      <main className='w-full'>
         <TravelPlanReport 
           data={data} 
           preferences={preferences}

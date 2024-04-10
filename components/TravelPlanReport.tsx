@@ -99,7 +99,7 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
     }
   return (
   <div className='flex flex-col justify-center md:items-center'>
-    <div className="prose prose-sm md:prose flex flex-col md:items-center md:justify-center pt-4">
+    <div className="prose prose-sm md:prose flex flex-col md:items-center md:justify-center px-4 pt-4">
       <h1>Trip to {preferences.destination}</h1>
       <div className='flex md:gap-4 md:font-bold flex-col md:flex-row '>
         <span>Start Date: {data.startDate}</span>
@@ -143,7 +143,7 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
           </div>
         </section>
       </div>
-      <div className="prose col-span-12">
+      <div className="prose col-span-12 px-4">
         <h2>Itinerary Detail</h2>
       </div>
       {
