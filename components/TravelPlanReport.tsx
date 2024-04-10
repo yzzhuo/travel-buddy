@@ -107,14 +107,14 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
         <span>Destination: {data.city}, {data.country}</span>
       </div>
     </div>
-    <div className='grid grid-cols-12 gap-6 max-w-5xl'>
-      <div className="col-span-12">
+    <div className='grid grid-cols-12 gap-6 max-w-5xl mt-6'>
+      <div className="col-span-12 md:block hidden">
         <section className='mt-8'>
-          <div className="prose prose-sm md:prose md:block hidden">
+          <div className="prose prose-sm md:prose">
             <h2>Itinerary Summary</h2>
           </div>
           <div className="overflow-x-auto mt-4 bg-white shadow-xl">
-            <table className="table table-fixed border hidden md:table">
+            <table className="table table-fixed border">
               <thead className='bg-slate-400 text-white'>
                 <tr>
                   <th>Date</th>
