@@ -30,6 +30,10 @@ export default function SharePage() {
       setLoading(true)
       const res = await fetch(`/api/itinerary?id=${id}`)
       const data = await res.json()
+      if (!data) {
+        toast.error('Itinerary not found')
+        return
+      }
       setData(data)
     } catch (error) {
       console.error(error)
@@ -54,14 +58,13 @@ export default function SharePage() {
         <title>tourbuddy</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className='w-full relative min-h-screen flex flex-col'>
+      <main className='w-full relative min-h-screen flex flex-col' style={{paddingBottom: '106px'}}>
         <div className='flex justify-end pt-2 px-2'>
-          {!loading && <button className="btn btn-circle btn-md " onClick={onClickShareLink}>
+          {!loading && data && <button className="btn btn-circle btn-md " onClick={onClickShareLink}>
             <ArrowUpOnSquareIcon className="h-4 w-4" />
           </button>
             }
         </div>
-       
         {data && <TravelPlanReport 
           data={data} 
           onChangeData={() => {}}
@@ -72,7 +75,7 @@ export default function SharePage() {
           </div>      
         }
         <Toaster position='top-center' />
-        <div className='sticky bottom-0 flex justify-center py-4 px-4 bg-white border flex-col items-center shadow-lg'>
+        <div className='fixed w-full bottom-0 flex justify-center py-4 px-4 bg-white border flex-col items-center shadow-lg'>
           <button className='btn btn-neutral' onClick={onClickStart}>Get Start with Tourbuddy</button>
           <aside className='text-xs text-gray-500 mt-2'>
             <p>Copyright © 2024 - All right reserved by Tourbuddy</p>
