@@ -7,11 +7,12 @@ import { LoadingCircle, SendIcon } from '../components/icons';
 import {ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/24/outline'
 import Markdown from 'react-markdown'
 import { useCompletion } from 'ai/react';
-import TravelPlanReport, { PlanResult, TravelPreference, generatePromptForTravelPlan } from '../components/TravelPlanReport';
+import TravelPlanReport, { generatePromptForTravelPlan } from '../components/TravelPlanReport';
 import LoadingDots from '../components/LoadingDots';
 import { ArrowUpOnSquareIcon } from '@heroicons/react/24/outline';
 import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard';
 import { toast, Toaster } from 'sonner';
+import { PlanResult, TravelPreference } from '@/lib/types';
 
 const dialogues = [
  {
@@ -24,7 +25,7 @@ const dialogues = [
  },
  {
     question: 'When do you plan to travel?',
-    id: 'travelDate',
+    id: 'startDate',
     tips:[{
       text: 'Want to know the best time to travel to your destination?',
       prompt: (preference: TravelPreference) =>`what is the best time to visit ${preference.destination}?`
@@ -35,7 +36,7 @@ const dialogues = [
  },
  {
     question: 'How long will your trip be?',
-    id: 'tripLength',
+    id: 'duration',
     tips: [{
       text: 'Suggested duration to visit the destination?',
       prompt: (preference: TravelPreference) => `what is the suggested duration to visit ${preference.destination}?`
@@ -53,20 +54,20 @@ const dialogues = [
     }
   ]
  },
- {
-    question: 'Do you have any dietary restrictions or do you have local food you want to try?',
-    id: 'dietary',
-    tips: [
-      {
-        text: 'What are the local food specialties?',
-        prompt: (preference: TravelPreference) => `What are the local food specialties in ${preference.destination}?`
-      },
-      {
-        text: 'Local restaurant price ranges and options?',
-        prompt: (preference: TravelPreference) => `What are the local restaurant price ranges and options in ${preference.destination}?`
-      }
-    ]
- },
+//  {
+//     question: 'Do you have any dietary restrictions or do you have local food you want to try?',
+//     id: 'dietary',
+//     tips: [
+//       {
+//         text: 'What are the local food specialties?',
+//         prompt: (preference: TravelPreference) => `What are the local food specialties in ${preference.destination}?`
+//       },
+//       {
+//         text: 'Local restaurant price ranges and options?',
+//         prompt: (preference: TravelPreference) => `What are the local restaurant price ranges and options in ${preference.destination}?`
+//       }
+//     ]
+//  },
 //  {
 //   id: 'other',
 //   question: 'Any other preferences or tips you would like to know?',
@@ -100,9 +101,7 @@ const Home: NextPage = () => {
     destination: '',
     startDate: '',
     duration: 1,
-    places: '',
-    activities: '',
-    dietary: '',
+    interests: '',
   });
   const [data, setData] = useState<PlanResult>(
     {
@@ -252,7 +251,6 @@ useEffect(() => {
               className="font-semibold text-white w-6 h-6 inline-flex justify-center rounded-full bg-black mr-1"
             >{step + 1}</span>
             {dialogues[step].question}
-            {/* <span className="text-slate-500">(city)</span> */}
           </p>
           <div className='flex flex-col mt-4 gap-2 mb-16'>
           {
@@ -269,7 +267,7 @@ useEffect(() => {
                   { tipResult[index] && tipResult[index].open ?
                   <ChevronDownIcon className="h-4 w-4 text-blue-800" /> : <ChevronRightIcon className="h-4 w-4 text-blue-800" />}
                 </div>
-                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4 md:max-h-42 overflow-y-auto'>
+                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4 md:max-h-44 overflow-y-auto'>
                   {tipResult[index].value ? tipResult[index].value : 'loading...'}
                 </Markdown> }
               </button>
