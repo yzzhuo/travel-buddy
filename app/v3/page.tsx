@@ -284,8 +284,8 @@ const planSteps: PlanStep[] = [
            </div>
           }
           {loading && <div className='flex justify-center items-center flex-col gap-4'>
-                <LoadingDots color="black" style="large" />
-                Generating, Please wait a moment..
+              <LoadingDots color="black" style="large" />
+                Generating, it may take a few minutes...
             </div>}
           {finished &&
             <TravelPlanReport 
