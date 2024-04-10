@@ -187,7 +187,7 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
                 <iframe
                     frameBorder="0"
                     height={750}
-                    className='h-56 md:h-96 shadow-xl'
+                    className='h-56 md:h-96'
                     style={{border:0, width: '100%', maxWidth: '100%'}}
                     referrerPolicy="no-referrer-when-downgrade"
                     src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&${generateDirectionQuery(item.places_to_visit)}&mode=${getTransportationMode(item.transportation)}`}

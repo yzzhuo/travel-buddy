@@ -162,7 +162,7 @@ useEffect(() => {
     setLoading(true);
     const prompt = `${dialogues[step].tips[tipIndex].prompt(preference)}`;
     console.log({ prompt });
-    const response = await complete(`${prompt}, anwser the question directly with content that are easy to read and clearly structured markdown format(for example use title/bold/list smartly).`);
+    const response = await complete(`${prompt}, anwser the question directly with concise content in markdown format.`);
     console.log({ response });
     setLoading(false);
   };
@@ -239,7 +239,7 @@ useEffect(() => {
                   { tipResult[index] && tipResult[index].open ?
                   <ChevronDownIcon className="h-4 w-4 text-blue-800" /> : <ChevronRightIcon className="h-4 w-4 text-blue-800" />}
                 </div>
-                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4 max-h-36 overflow-y-auto'>
+                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4 md:max-h-42 overflow-y-auto'>
                   {tipResult[index].value ? tipResult[index].value : 'loading...'}
                 </Markdown> }
               </button>
@@ -269,8 +269,8 @@ useEffect(() => {
       </Head>
 
       <Header />
-      <main className="flex flex-1 w-full flex-col items-center  text-center px-4 ">
-      {finished ? renderPlan() :<> <div className="border-gray-200sm:mx-0 mx-5 mt-5 max-w-screen-md rounded-md border sm:w-full">
+      <main className="flex flex-1 w-full flex-col items-center  text-center md:px-4 ">
+      {finished ? renderPlan() :<> <div className="border-gray-200  md:mx-5 md:mt-5 max-w-screen-md rounded-md border w-full">
           <div className="flex flex-col md:space-y-4 p-7 sm:p-10 items-center bg-white shadow-lg">
             <Image
               src="/avatar.png"
