@@ -224,7 +224,7 @@ useEffect(() => {
             {dialogues[step].question}
             {/* <span className="text-slate-500">(city)</span> */}
           </p>
-          <div className='flex flex-col mt-4 gap-2'>
+          <div className='flex flex-col mt-4 gap-2 mb-16'>
           {
             dialogues[step].tips && dialogues[step].tips.length > 0 ? 
               dialogues[step].tips.map((tip, index) => {
@@ -239,7 +239,7 @@ useEffect(() => {
                   { tipResult[index] && tipResult[index].open ?
                   <ChevronDownIcon className="h-4 w-4 text-blue-800" /> : <ChevronRightIcon className="h-4 w-4 text-blue-800" />}
                 </div>
-                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4'>
+                { tipResult[index] && tipResult[index].open && <Markdown className='text-sm py-4 p-4 max-h-36 overflow-y-auto'>
                   {tipResult[index].value ? tipResult[index].value : 'loading...'}
                 </Markdown> }
               </button>

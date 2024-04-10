@@ -3,12 +3,12 @@ import Github from './GitHub';
 
 export default function Header() {
   return (
-    <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-7 sm:px-4 px-2">
+    <header className="flex justify-between items-center w-full border-b-2 py-2 px-2">
       <Link href="/" className="flex space-x-3">
         <img
           alt="header text"
           src="/tourbuddy_logo.png"
-          className="h-16"
+          className="h-12"
         />
       </Link>
       {/* <a

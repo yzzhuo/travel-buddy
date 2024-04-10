@@ -98,23 +98,23 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
       }
     }
   return (
-  <div className='flex flex-col justify-center items-center my-4 bg-white shadow-lg p-4'>
-    <div className="prose flex flex-col items-center justify-center space-x-3">
+  <div className='flex flex-col justify-center md:items-center'>
+    <div className="prose prose-sm md:prose flex flex-col md:items-center md:justify-center pt-4">
       <h1>Trip to {preferences.destination}</h1>
-      <div className='flex gap-4 font-bold'>
+      <div className='flex md:gap-4 md:font-bold flex-col md:flex-row '>
         <span>Start Date: {data.startDate}</span>
-        <span>Duration: {data.duration} day</span>
+        <span>Duration: {data.duration}</span>
         <span>Destination: {data.city}, {data.country}</span>
       </div>
     </div>
     <div className='grid grid-cols-12 gap-6 max-w-5xl'>
       <div className="col-span-12">
         <section className='mt-8'>
-          <div className="prose">
+          <div className="prose prose-sm md:prose md:block hidden">
             <h2>Itinerary Summary</h2>
           </div>
           <div className="overflow-x-auto mt-4">
-            <table className="table table-fixed border">
+            <table className="table table-fixed border hidden md:table">
               <thead className='bg-slate-400 text-white'>
                 <tr>
                   <th>Date</th>
@@ -153,7 +153,7 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
               <div >
                 <div className="prose">
                   <h3>{item.date}</h3>
-                  <div className='flex gap-4'>
+                  <div className='flex md:flex-row gap-4 flex-col'>
                     <span>City: {item.city}</span>
                     <div className='flex gap-2'>Transportation: 
                     <select className="select select-sm text-sm py-1" 
@@ -180,22 +180,22 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
                         ))
                         }
                       </select>
-                      {/* {item.transportation} */}
                       </div>
                   </div>
                 </div>
-                <div className="grid mt-4 grid-cols-12 w-full gap-4">
+                <div className="grid mt-4  flex-col md:grid-cols-12 w-full gap-4">
                   <div className="col-span-6">
                   <iframe
                       frameBorder="0"
                       height={750}
-                      style={{border:0, width: '100%', height:'600px', maxWidth: '100%'}}
+                      className='h-56 md:h-96 shadow-xl'
+                      style={{border:0, width: '100%', maxWidth: '100%'}}
                       referrerPolicy="no-referrer-when-downgrade"
                       src={`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&${generateDirectionQuery(item.places_to_visit)}&mode=${getTransportationMode(item.transportation)}`}
                       allowFullScreen
                     />
                   </div>
-                  <div className='col-span-6'>
+                  <div className='col-span-6 bg-white p-2 rounded-lg shadow-lg'>
                     <div className='prose'>
                       <h4 className='font-bold'>Route</h4>
                       <p>{item.places_to_visit.map((place: any, index: number) => (
@@ -224,10 +224,9 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
                             <span>Price: {place.price}</span>
                           </div> */}
                           <p>{place.brief_intro}</p>
-                          {/* <p>Tip: {place.tip}</p> */}
-                          {place.tip && <div role="alert" className="alert px-2 py-1 text-sm">
+                          {place.tip && <div role="alert" className="alert px-2 py-1 flex justify-start">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>Tip: {place.tip}</span>
+                            <span className='text-left text-xs md:text-sm flex-auto'>Tip: {place.tip}</span>
                           </div>
                           }
                         </li>
