@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import { LoadingCircle, SendIcon } from '../components/icons';
-import {ChevronRightIcon, ChevronDownIcon} from '@heroicons/react/24/outline'
+import {ChevronRightIcon, ChevronDownIcon, ArrowLeftIcon, ArrowRightIcon} from '@heroicons/react/24/outline'
 import Markdown from 'react-markdown'
 import { useCompletion } from 'ai/react';
 import TravelPlanReport, { generatePromptForTravelPlan } from '../components/TravelPlanReport';
@@ -99,11 +99,10 @@ const Home: NextPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   const [step, setStep] = useState(0);
-  const [inputText, setInputText] = useState('');
   const [preference, setPreference] = useState<TravelPreference>({
     destination: '',
     startDate: '',
-    duration: 1,
+    duration: '',
     interests: '',
   });
   const [data, setData] = useState<PlanResult>(
@@ -149,16 +148,8 @@ useEffect(() => {
   }, [completion])
 
   const handleNext = (e: any) => {
-    if (!inputText) return;
-    const updatedPreference = {
-        ...preference,
-        [dialogues[step].id]: inputText,
-    }
-    setPreference(updatedPreference);
-    console.log({ preference });
-    setInputText('');
     if (step === dialogues.length - 1) {
-      generatePlan(updatedPreference);
+      generatePlan();
       setFinishedInput(true);
     } else {
       setStep(step + 1);
@@ -174,7 +165,7 @@ useEffect(() => {
     setLoading(false);
   };
 
-  const generatePlan = async (preference: TravelPreference) => {
+  const generatePlan = async () => {
     setLoading(true);
     const prompt = generatePromptForTravelPlan(preference);
     console.log({ preference, prompt });
@@ -238,12 +229,32 @@ useEffect(() => {
   const renderStep = () => {
       return <>
         <div className="flex-col justify-start items-start space-x-3">
-          <p className="text-left font-medium flex-auto">
-            <span
-              className="font-semibold text-white w-6 h-6 inline-flex justify-center rounded-full bg-black mr-1"
-            >{step + 1}</span>
-            {dialogues[step].question}
-          </p>
+          <div className='flex justify-between w-full'>
+            <p className="text-left font-medium flex-auto">
+              <span
+                className="font-semibold text-white w-6 h-6 inline-flex justify-center rounded-full bg-black mr-1"
+              >{step + 1}</span>
+              {dialogues[step].question}
+            </p>
+            <div className='flex justify-start'>
+            {step !==0 && <button className='btn btn-outline btn-sm border-none' onClick={() => {
+                  setStep(step - 1)
+                }}>
+                <ArrowLeftIcon className="h-4 w-4" />
+              </button>}
+            {step !== dialogues.length - 1 && <button className='btn btn-outline btn-sm border-none' onClick={() => {
+                // @ts-ignore
+                if (!preference?.[dialogues?.[step]?.id]) {
+                  toast.error('Please answer the question to proceed')
+                  return
+                }
+                setStep(step + 1)
+              }}>
+                <ArrowRightIcon className="h-4 w-4" />
+              </button>
+              }
+            </div>
+          </div>
           <div className='flex flex-col mt-4 gap-2 mb-16'>
           {
             dialogues[step].tips && dialogues[step].tips.length > 0 ? 
@@ -309,7 +320,7 @@ useEffect(() => {
               Hi, I'm Tourbuddy!
             </h1>
             <p className="text-gray-500 sm:block hidden">
-              I'm an AI bot help you to make your personalized travel plan
+              I will help you to make your personalized travel plan
             </p>
           </div>
           <div className='w-full relative h-1 bg-gray-50'>
@@ -337,8 +348,15 @@ useEffect(() => {
           className="relative w-full max-w-screen-md rounded-xl border border-gray-200 bg-white px-4 pb-2 pt-3 shadow-lg sm:pb-3 sm:pt-4"
         >
           <input
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            value={
+              // @ts-ignore
+              preference[dialogues[step].id]}
+            onChange={(e) => {
+              setPreference({
+                ...preference,
+                [dialogues[step].id]: e.target.value
+              })
+            }}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
             />
             <button className='absolute inset-y-0 right-3 top-1 my-auto flex h-8 w-8 items-center justify-center rounded-md transition-all'

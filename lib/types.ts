@@ -11,7 +11,7 @@ export interface PlanStep {
 export interface TravelPreference {
   destination: string;
   startDate: string;
-  duration: number;
+  duration: string;
   interests?: string;
   places?: string;
   activities?: string;
