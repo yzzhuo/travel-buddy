@@ -13,7 +13,7 @@ const Home: NextPage = () => {
   const [preferences, setPreferences] = useState<TravelPreference>({
     destination: 'Helsinki',
     startDate: new Date().toISOString().split('T')[0],
-    duration: 1,
+    duration: '',
   });
   const [loading, setLoading] = useState(false);
   const { complete } = useCompletion({
@@ -113,7 +113,7 @@ const Home: NextPage = () => {
                 onChange={(e) => 
                   setPreferences({
                     ...preferences,
-                    duration: parseInt(e.target.value),
+                    duration: e.target.value,
                   })
                 }
               />

@@ -87,7 +87,7 @@ const planSteps: PlanStep[] = [
            onChange={(e) => 
              setPreferences({
                ...preferences,
-               duration: parseInt(e.target.value),
+               duration: e.target.value,
              })
            }
          />
@@ -176,7 +176,7 @@ const planSteps: PlanStep[] = [
    const [preference, setPreference] = useState<TravelPreference>({
      destination: '',
      startDate: '',
-     duration: 1,
+     duration: '',
      places: '',
      activities: '',
      dietary: '',
