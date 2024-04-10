@@ -256,7 +256,6 @@ useEffect(() => {
       {/* <Markdown remarkPlugins={[remarkGfm]}>{planResult}</Markdown> */}
       <TravelPlanReport 
         data={data} 
-        preferences={preference}
         onChangeData={setData}
         />
     </div>

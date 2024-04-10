@@ -290,7 +290,6 @@ const planSteps: PlanStep[] = [
           {finished &&
             <TravelPlanReport 
               data={data} 
-              preferences={preference}
               onChangeData={setData}
               />
           }

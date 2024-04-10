@@ -1,7 +1,9 @@
-// @ts-ignore
 import TravelPlanReport, { PlanResult } from '@/components/TravelPlanReport';
+import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { toast, Toaster } from 'sonner';
+
 
 interface Preference {
   destination: string;
@@ -114,6 +116,22 @@ const Home: NextPage = () => {
     startDate: 'April 1, 2024',
     duration: 3
   } as Preference;
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+
+  const onGetShareLink = async() => {
+    if (isCopied) return
+    const res = await fetch('/api/itinerary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    const resJson = await res.json();
+    const shareLink = `${window.location.origin}/share/${resJson.id}`;
+    copyToClipboard(shareLink);
+    toast.success('Share link copied to clipboard')
+  }
 
   return (
     <div className="flex flex-col w-full mx-auto stretch">
@@ -122,9 +140,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className='w-full'>
+        <div className='flex justify-end p-4'>
+          <button className='bg-blue-500 text-white p-2 rounded-md' onClick={onGetShareLink}>Share</button>
+        </div>
+        <Toaster position="top-center" />
         <TravelPlanReport 
           data={data} 
-          preferences={preferences}
           onChangeData={() => {}}
         />        
       </main>

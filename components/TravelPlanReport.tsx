@@ -70,14 +70,13 @@ export const generatePromptForTravelPlan = (preferences: TravelPreference) => {
   ---
   `;
 }
-export default function TravelPlanReport({preferences, data, onChangeData}:
-   {preferences: TravelPreference, 
+export default function TravelPlanReport({data, onChangeData}:
+   {
     data: PlanResult,
     onChangeData: (data: PlanResult) => void,
   }) {
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
     const generateDirectionQuery = (places: any[]) => {
       if (places.length > 0) {
         let query = `origin=${places[0].name.replace('', '+')}&destination=${places[places.length - 1].name.replace('', '+')}&`;
@@ -100,11 +99,11 @@ export default function TravelPlanReport({preferences, data, onChangeData}:
   return (
   <div className='flex flex-col justify-center md:items-center'>
     <div className="prose prose-sm md:prose flex flex-col md:items-center md:justify-center px-4 pt-4">
-      <h1>Trip to {preferences.destination}</h1>
+      <h1>Trip to {data.country ? data.country : data.city}</h1>
       <div className='flex md:gap-4 md:font-bold flex-col md:flex-row '>
         <span>Start Date: {data.startDate}</span>
         <span>Duration: {data.duration}</span>
-        <span>Destination: {data.city}, {data.country}</span>
+        <span>Destination: {data.country ? data.country : data.city}</span>
       </div>
     </div>
     <div className='grid grid-cols-12 gap-6 max-w-5xl mt-6'>

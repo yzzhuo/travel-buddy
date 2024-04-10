@@ -9,6 +9,9 @@ import Markdown from 'react-markdown'
 import { useCompletion } from 'ai/react';
 import TravelPlanReport, { PlanResult, TravelPreference, generatePromptForTravelPlan } from '../components/TravelPlanReport';
 import LoadingDots from '../components/LoadingDots';
+import { ArrowUpOnSquareIcon } from '@heroicons/react/24/outline';
+import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard';
+import { toast, Toaster } from 'sonner';
 
 const dialogues = [
  {
@@ -88,6 +91,9 @@ const Home: NextPage = () => {
     api: '/api/completion',
   });
   const [loading, setLoading] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   const [step, setStep] = useState(0);
   const [inputText, setInputText] = useState('');
   const [preference, setPreference] = useState<TravelPreference>({
@@ -110,7 +116,6 @@ const Home: NextPage = () => {
   const [tipResult, setTipResult] = useState<UITip[]>([])
   const [finishedInput, setFinishedInput] = useState(false);
   const [finished, setFinished] = useState(false);
-
   useEffect(() => {
     const currentTips = dialogues[step].tips.map((tip) => {
       return {
@@ -214,6 +219,31 @@ useEffect(() => {
     setTipResult(newTipResult);
   }
 
+  const generateShareLink = async() => {
+    if (isCopied) return
+    if (!shareLink) {
+      setIsSaving(true);
+      try {
+        const res = await fetch('/api/itinerary', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        const resJson = await res.json();
+        const link = `${window.location.origin}/share/${resJson.id}`;
+        setShareLink(link);
+      } catch (error) {
+        toast.error('Failed to save the itinerary');
+      } finally {
+        setIsSaving(false);
+      }
+    } 
+    copyToClipboard(shareLink);
+    toast.success('Share link copied to clipboard')
+  }
+  
   const renderStep = () => {
       return <>
         <div className="flex-col justify-start items-start space-x-3">
@@ -253,10 +283,15 @@ useEffect(() => {
 
   const renderPlan = () => {
     return <div className='text-left'>
-      {/* <Markdown remarkPlugins={[remarkGfm]}>{planResult}</Markdown> */}
+      <div className='flex justify-end pt-2 px-2'>
+        <button className="btn btn-circle btn-md " onClick={generateShareLink} disabled={isSaving}>
+          { isSaving ? <LoadingCircle /> :
+            <ArrowUpOnSquareIcon className="h-4 w-4" />
+          }
+        </button>
+      </div>
       <TravelPlanReport 
         data={data} 
-        preferences={preference}
         onChangeData={setData}
         />
     </div>
@@ -270,6 +305,7 @@ useEffect(() => {
 
       <Header />
       <main className="flex flex-1 w-full flex-col items-center  text-center md:px-4 ">
+        <Toaster position="top-center" />
       {finished ? renderPlan() :<> <div className="border-gray-200  md:mx-5 md:mt-5 max-w-screen-md rounded-md border w-full">
           <div className="flex flex-col md:space-y-4 p-7 sm:p-10 items-center bg-white shadow-lg">
             <Image

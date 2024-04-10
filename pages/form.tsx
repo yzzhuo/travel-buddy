@@ -179,7 +179,6 @@ const Home: NextPage = () => {
           </div>
           <TravelPlanReport 
             data={data} 
-            preferences={preferences}
             onChangeData={setData}
           />
         </div>
