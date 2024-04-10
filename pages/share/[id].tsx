@@ -62,6 +62,7 @@ export default function SharePage() {
             }
         </div>
         {data && <TravelPlanReport 
+          readonly={true}
           data={data} 
           onChangeData={() => {}}
         />   

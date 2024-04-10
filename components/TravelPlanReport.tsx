@@ -34,10 +34,11 @@ export const generatePromptForTravelPlan = (preferences: TravelPreference) => {
   ---
   `;
 }
-export default function TravelPlanReport({data, onChangeData}:
+export default function TravelPlanReport({data, onChangeData, readonly}:
    {
     data: PlanResult,
     onChangeData: (data: PlanResult) => void,
+    readonly?: boolean
   }) {
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
@@ -118,6 +119,8 @@ export default function TravelPlanReport({data, onChangeData}:
                 <div className='flex md:flex-row gap-4 flex-col'>
                   <span>City: {item.city}</span>
                   <div className='flex gap-2'>Transportation: 
+                  {readonly ? 
+                  <span>{item.transportation}</span> :
                   <select className="select select-sm text-sm py-1" 
                     value={item.transportation}
                     onChange={(e) => {
@@ -142,6 +145,7 @@ export default function TravelPlanReport({data, onChangeData}:
                       ))
                       }
                     </select>
+                  }
                     </div>
                 </div>
               </div>
@@ -180,6 +184,11 @@ export default function TravelPlanReport({data, onChangeData}:
                             <MapIcon className="w-4 h-4 inline-block text-geay" />
                           </a>
                         </h5>
+                        {/* <div className='flex gap-4'>
+                          <span>Address: {place.address}</span>
+                          <span>Transportation: {place.transportation}</span>
+                          <span>Price: {place.price}</span>
+                        </div> */}
                         <p>{place.brief_intro}</p>
                         {place.tip && <div role="alert" className="alert px-2 py-1 flex justify-start">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
