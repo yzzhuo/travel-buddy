@@ -9,11 +9,6 @@ import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
 
 
-interface Preference {
-  destination: string;
-  startDate: string;
-  duration: number;
-}
 export default function SharePage() {
   const router = useRouter()
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })

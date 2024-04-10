@@ -233,13 +233,15 @@ useEffect(() => {
         const resJson = await res.json();
         const link = `${window.location.origin}/share/${resJson.id}`;
         setShareLink(link);
+        copyToClipboard(link);
       } catch (error) {
         toast.error('Failed to save the itinerary');
       } finally {
         setIsSaving(false);
       }
-    } 
-    copyToClipboard(shareLink);
+    } else {
+      copyToClipboard(shareLink);
+    }
     toast.success('Share link copied to clipboard')
   }
   
