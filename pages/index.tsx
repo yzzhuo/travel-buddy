@@ -167,21 +167,28 @@ useEffect(() => {
 
   const generatePlan = async () => {
     setLoading(true);
-    try {
-      const prompt = generatePromptForTravelPlan(preference);
-      console.log({ preference, prompt });
-      const response = await completeJSON(prompt);
-      console.log({ response });
-      const result = JSON.parse(response as string);
-      console.log({ result });
-      setData(result);
-      setFinished(true);
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to generate the travel plan');
-    } finally {
-      setLoading(false);
+    let retryCount = 0;
+    const maxRetries = 3;
+    while (retryCount < maxRetries) {
+      try {
+        const prompt = generatePromptForTravelPlan(preference);
+        console.log({ preference, prompt });
+        const response = await completeJSON(prompt);
+        console.log({ response });
+        const result = JSON.parse(response as string);
+        console.log({ result });
+        setData(result);
+        setFinished(true);
+        break; // Exit the loop if successful
+      } catch (error) {
+        console.error(error);
+        retryCount++;
+        if (retryCount === maxRetries) {
+          toast.error('Failed to generate the travel plan');
+        }
+      }
     }
+    setLoading(false);
   }
 
   const handlClickTip = (index: number) => {
